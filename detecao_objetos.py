@@ -15,14 +15,14 @@ model = YOLO("yolov5su.pt")
 
 detection_log = "detections_log.csv"
 image_save_path = "detections_images"
-os.makedirs(image_save_path, exist_ok=True)  # Criar pasta para salvar imagens
+os.makedirs(image_save_path, exist_ok=True) 
 
 def speak(text):
     """Converte texto em fala usando gTTS e evita erro de permissão."""
     temp_audio_path = "audio_temp.mp3"
     tts = gTTS(text=text, lang='pt')
     tts.save(temp_audio_path)
-    subprocess.call(["start", "", temp_audio_path], shell=True)  # Executa o áudio no Windows
+    subprocess.call(["start", "", temp_audio_path], shell=True)  
 
 def log_detection(detections):
     """Salva logs das detecções em CSV e captura imagens."""
@@ -114,7 +114,7 @@ def gradio_interface():
         description="Envie uma imagem para detectar objetos ou clique no botão para usar a webcam.",
         live=True
     )
-    interface.launch(share=True)  # 🔹 Criar link público
+    interface.launch(share=True)  
 
 if __name__ == "__main__":
     print("📷 Iniciando detecção de objetos em tempo real com áudio e logs...")
