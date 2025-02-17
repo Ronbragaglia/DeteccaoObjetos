@@ -59,7 +59,7 @@ A interface será aberta no navegador e a detecção será iniciada.
 💡 Caso tenha sugestões ou melhorias, fique à vontade para abrir uma issue ou um pull request no repositório!
 
 📢 Autor: Rone Bragaglia
-📌 Repositório: github.com/Ronbragaglia/Deteccao-Objetos
+
 
 
 
