@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Serviço principal do Sistema de Detecção de Objetos
+  detection:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: deteccao-objetos
+    ports:
+      - "7860:7860"
+    volumes:
+      # Montar diretórios para persistência
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./output:/app/output
+      - ./detections_images:/app/detections_images
+      # Montar arquivo de configuração
+      - ./.env:/app/.env
+    environment:
+      # Variáveis de ambiente
+      - MODEL_NAME=${MODEL_NAME:-yolov5su.pt}
+      - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.3}
+      - AUDIO_ENABLED=${AUDIO_ENABLED:-true}
+      - LOGGING_ENABLED=${LOGGING_ENABLED:-true}
+      - SAVE_IMAGES=${SAVE_IMAGES:-true}
+      - GRADIO_SHARE=${GRADIO_SHARE:-false}
+      - GRADIO_PORT=${GRADIO_PORT:-7860}
+    restart: unless-stopped
+    # Recursos do container
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+    # Configurações de GPU (opcional, para NVIDIA)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    networks:
+      - detection-network
+
+  # Serviço opcional para monitoramento (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    networks:
+      - detection-network
+    profiles:
+      - monitoring
+
+  # Serviço opcional para visualização (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    restart: unless-stopped
+    networks:
+      - detection-network
+    profiles:
+      - monitoring
+
+networks:
+  detection-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:

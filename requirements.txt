@@ -1,0 +1,38 @@
+# Dependências do Sistema de Detecção de Objetos
+
+# Framework de Deep Learning
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# YOLOv5
+ultralytics>=8.0.0
+
+# Processamento de Imagens
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# Interface de Usuário
+gradio>=4.0.0
+
+# Síntese de Voz
+gtts>=2.3.0
+
+# Manipulação de Dados
+pandas>=2.0.0
+
+# Configuração
+python-dotenv>=1.0.0
+
+# Logging
+colorlog>=6.7.0
+
+# Testes
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+
+# Qualidade de Código
+black>=23.7.0
+flake8>=6.1.0
+mypy>=1.5.0
