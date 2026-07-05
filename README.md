@@ -1,17 +1,31 @@
-# 🎯 Sistema de Detecção de Objetos em Tempo Real com YOLOv5 e Áudio
+<div align="center">
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+# 🎯 Detecção de Objetos em Tempo Real com YOLOv5 e Áudio
+
+**Envie uma imagem ou ligue a webcam, veja as _bounding boxes_ na hora e ouça o sistema anunciar cada objeto por voz, tudo numa interface Gradio que roda no navegador.**
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Plataformas](https://img.shields.io/badge/plataformas-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 
-Sistema completo de detecção de objetos em tempo real utilizando YOLOv5, OpenCV e Gradio com saída em áudio. O sistema oferece uma interface de usuário intuitiva, logging automático de detecções e suporte a múltiplas plataformas.
+[![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![YOLOv5](https://img.shields.io/badge/YOLOv5-Ultralytics-0A0A0A.svg)](https://github.com/ultralytics/ultralytics)
+[![OpenCV](https://img.shields.io/badge/OpenCV-5C3EE8?logo=opencv&logoColor=white)](https://opencv.org/)
+[![Gradio](https://img.shields.io/badge/Gradio-F97316?logo=gradio&logoColor=white)](https://www.gradio.app/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 
 ![Detecção de Objetos](https://github.com/user-attachments/assets/30445a40-1a20-42b0-bf80-b35cccbbbe3a)
+
+</div>
+
+Sistema completo de visão computacional que combina **YOLOv5**, **OpenCV** e **Gradio** para detectar objetos em imagens e na webcam. Cada detecção vira três coisas ao mesmo tempo: uma caixa anotada com o rótulo e a confiança, um anúncio em áudio por voz (gTTS) e um registro em CSV com a imagem recortada. O projeto vem empacotado com testes, Docker e pipeline de CI/CD, pronto para rodar e para evoluir.
 
 ## 📋 Índice
 
 - [Características](#características)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Arquitetura e Pipeline](#arquitetura-e-pipeline)
+- [Tecnologias](#tecnologias)
 - [Instalação](#instalação)
 - [Uso](#uso)
 - [Configuração](#configuração)
@@ -19,41 +33,91 @@ Sistema completo de detecção de objetos em tempo real utilizando YOLOv5, OpenC
 - [API](#api)
 - [Desenvolvimento](#desenvolvimento)
 - [Docker](#docker)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Precisão do Modelo](#precisão-do-modelo)
 - [Contribuindo](#contribuindo)
 - [Licença](#licença)
 
 ## ✨ Características
 
-- 🎯 **Detecção em Tempo Real**: Detecção de objetos usando YOLOv5 com alta precisão
-- 🖥️ **Interface Gráfica**: Interface interativa com Gradio
-- 🎤 **Síntese de Voz**: Anúncios de áudio para objetos detectados
-- 📊 **Logging Automático**: Registro de detecções em CSV
-- 💾 **Salvamento de Imagens**: Armazenamento automático de imagens detectadas
-- ⚙️ **Configuração Flexível**: Personalização via arquivo .env
-- 🐳 **Suporte a Docker**: Containerização fácil com Docker e Docker Compose
-- 🧪 **Testes Automatizados**: Suíte completa de testes
-- 📈 **Estatísticas**: Análise detalhada de detecções
-- 🌐 **Multi-plataforma**: Funciona em Windows, Linux e macOS
+- 🎯 **Detecção em imagens e em tempo real**: inferência com YOLOv5 (Ultralytics) tanto em imagens enviadas quanto no fluxo ao vivo da webcam.
+- 🟩 **Anotação visual**: cada objeto ganha uma _bounding box_ com rótulo e percentual de confiança desenhados via OpenCV.
+- 🎤 **Narração por voz**: anúncio em áudio de cada detecção com gTTS (Google Text-to-Speech) e reprodução multiplataforma (Windows, Linux e macOS).
+- 📊 **Log automático em CSV**: cada detecção é registrada com data, rótulo, confiança e coordenadas da caixa.
+- 💾 **Recorte salvo em imagem**: a região detectada é recortada e salva em disco automaticamente.
+- 📈 **Estatísticas e exportação**: total de detecções, objetos únicos, confiança média, objetos mais comuns e período, com exportação em CSV, JSON ou Excel.
+- 🖥️ **Interface Gradio com 4 abas**: Detecção em Imagens, Detecção em Tempo Real, Configurações e Estatísticas, ajustáveis em tempo de execução.
+- 🎚️ **Filtro de classes**: liste apenas as classes que quer detectar (`allowed_classes`) ou exclua algumas (`excluded_classes`).
+- ⚙️ **Configuração flexível**: tudo controlado por um `.env` ou pela dataclass `Config` (`from_env`, `from_dict`, `to_dict`).
+- 🐳 **Pronto para Docker**: `Dockerfile` e `docker-compose.yml`, com perfil opcional de monitoramento (Prometheus e Grafana).
+- 🚦 **CI/CD**: pipeline no GitHub Actions com matriz Windows, Linux e macOS por Python 3.8 a 3.11, linting (flake8, black, mypy), testes (pytest com cobertura) e scan de segurança (bandit).
+- 🌐 **Multiplataforma**: funciona em Windows, Linux e macOS.
 
-## 🛠️ Tecnologias Utilizadas
+## 🧭 Arquitetura e Pipeline
 
-- **Python 3.8+**: Linguagem principal
-- **YOLOv5 (Ultralytics)**: Modelo de detecção de objetos
-- **OpenCV**: Processamento de imagens e vídeo
-- **Gradio**: Interface de usuário interativa
-- **gTTS**: Google Text-to-Speech para síntese de voz
-- **PyTorch**: Framework de deep learning
-- **Pandas**: Manipulação de dados e logging
+Da entrada ao navegador, o fluxo de dados é o seguinte:
+
+```mermaid
+flowchart LR
+    subgraph ENTRADA["Entrada"]
+        A["Imagem enviada"]
+        B["Webcam ao vivo"]
+    end
+
+    subgraph NUCLEO["Detecção"]
+        C["Pré-processamento<br/>OpenCV"]
+        D["YOLOv5<br/>Ultralytics"]
+        E{"Confiança acima<br/>do limiar?"}
+        F["Detecções<br/>rótulo, confiança, bbox"]
+    end
+
+    subgraph SAIDA["Saídas"]
+        G["Frame anotado<br/>bounding boxes"]
+        H["Áudio gTTS<br/>anuncia o objeto"]
+        I["Log CSV +<br/>imagem recortada"]
+        J["Estatísticas e<br/>relatórios"]
+    end
+
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    E -- "nao" --> X["Descarta"]
+    E -- "sim" --> F
+    F --> G
+    F --> H
+    F --> I
+    I --> J
+    G --> UI["Interface Gradio<br/>no navegador"]
+    H --> UI
+```
+
+O código é modular: `Config` centraliza os parâmetros, `ObjectDetector` cuida da inferência, `Speaker` do áudio, `DetectionLogger` do registro e `GradioInterface` amarra tudo na interface web.
+
+## 🛠️ Tecnologias
+
+| Camada | Ferramenta |
+|--------|------------|
+| Modelo de detecção | YOLOv5 via [Ultralytics](https://github.com/ultralytics/ultralytics) |
+| Deep learning | [PyTorch](https://pytorch.org/) |
+| Visão computacional | [OpenCV](https://opencv.org/) |
+| Interface web | [Gradio](https://www.gradio.app/) |
+| Síntese de voz | [gTTS](https://pypi.org/project/gTTS/) (Google Text-to-Speech) |
+| Dados e logging | [pandas](https://pandas.pydata.org/) |
+| Empacotamento | Docker e Docker Compose |
+| Qualidade | pytest, black, flake8, mypy, bandit |
 
 ## 📥 Instalação
 
 ### Pré-requisitos
 
 - Python 3.8 ou superior
-- pip (gerenciador de pacotes Python)
-- Webcam (para detecção em tempo real)
+- pip
+- Webcam (opcional, apenas para a detecção em tempo real)
 
-### Instalação via pip
+Na primeira execução, os pesos do modelo (`yolov5su.pt`) são baixados automaticamente pela Ultralytics.
+
+### A partir do código-fonte
 
 1. Clone o repositório:
 
@@ -62,13 +126,13 @@ git clone https://github.com/Ronbragaglia/DeteccaoObjetos.git
 cd DeteccaoObjetos
 ```
 
-2. Crie um ambiente virtual (recomendado):
+2. Crie e ative um ambiente virtual (recomendado):
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
+source venv/bin/activate   # Linux/macOS
 # ou
-venv\Scripts\activate  # Windows
+venv\Scripts\activate      # Windows
 ```
 
 3. Instale as dependências:
@@ -81,24 +145,19 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edite o arquivo .env conforme necessário
+# Edite o .env conforme necessário
 ```
 
-### Instalação via Docker
+> Dica: instalando em modo editável com `pip install -e .`, o comando `deteccao-objetos` fica disponível como atalho para `python main.py`.
 
-1. Construa a imagem Docker:
+### Via Docker
 
 ```bash
 docker build -t deteccao-objetos .
-```
-
-2. Execute o container:
-
-```bash
 docker run -p 7860:7860 deteccao-objetos
 ```
 
-### Instalação via Docker Compose
+### Via Docker Compose
 
 ```bash
 docker-compose up -d
@@ -106,149 +165,115 @@ docker-compose up -d
 
 ## 🚀 Uso
 
-### Iniciar o Sistema
+### ▶️ Rodando a demo Gradio
+
+O jeito recomendado de rodar é pela aplicação modular completa:
 
 ```bash
 python main.py
 ```
 
-O sistema iniciará automaticamente e abrirá uma interface no navegador.
+O que acontece:
 
-### Usando a Interface Gráfica
+1. As configurações são carregadas do `.env`, o modelo YOLOv5 é inicializado e a interface Gradio sobe.
+2. A demo abre no navegador em `http://localhost:7860`. Com `GRADIO_SHARE=true`, um link público `*.gradio.live` também é gerado.
+3. Use as abas para interagir:
+   - **📷 Detecção em Imagens**: envie uma imagem e clique em **Detectar Objetos** para ver as caixas anotadas.
+   - **📹 Detecção em Tempo Real**: clique em **Iniciar Detecção** para ligar a webcam. Uma janela do OpenCV abre com a detecção ao vivo. Pressione `q` nessa janela (ou o botão **Parar**) para encerrar.
+   - **⚙️ Configurações**: ajuste o limiar de confiança e ligue ou desligue áudio, logging e salvamento de imagens em tempo de execução.
+   - **📊 Estatísticas**: veja o resumo das detecções registradas.
 
-1. **Aba de Detecção em Imagens**:
-   - Carregue uma imagem
-   - Clique em "Detectar Objetos"
-   - Visualize os resultados
+> **Placeholder de demo:** um GIF curto da aba "Detecção em Tempo Real" (objetos sendo detectados ao vivo com narração em áudio) cairia muito bem aqui. Sugestão: grave a tela, salve como `docs/demo.gif` e referencie com `![Demo ao vivo](docs/demo.gif)`.
 
-2. **Aba de Detecção em Tempo Real**:
-   - Clique em "Iniciar Detecção"
-   - A webcam será ativada
-   - Pressione 'q' na janela OpenCV para parar
+> **Nota sobre a webcam:** a detecção em tempo real usa a câmera local e abre uma janela do OpenCV na máquina que roda o servidor. Em um container Docker sem acesso a câmera e sem display, prefira a aba de imagens; a detecção ao vivo funciona melhor rodando localmente.
 
-3. **Aba de Configurações**:
-   - Ajuste o limiar de confiança
-   - Habilite/desabilite áudio
-   - Configure logging e salvamento de imagens
+### Modo script (entrada alternativa)
 
-4. **Aba de Estatísticas**:
-   - Visualize estatísticas de detecção
-   - Exporte dados em diferentes formatos
+O repositório também mantém o script original, mais enxuto, com uma interface Gradio de imagem única e detecção via webcam por thread:
+
+```bash
+python detecao_objetos.py
+```
 
 ## ⚙️ Configuração
 
-### Variáveis de Ambiente
-
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
+O sistema é configurado por variáveis de ambiente. Copie `.env.example` para `.env` e ajuste:
 
 ```env
-# Configurações do Modelo
+# Modelo
 MODEL_NAME=yolov5su.pt
 CONFIDENCE_THRESHOLD=0.3
 MAX_DETECTIONS=100
 DEVICE=cpu
 
-# Configurações de Áudio
+# Áudio
 AUDIO_ENABLED=true
 AUDIO_LANGUAGE=pt
 
-# Configurações de Logging
+# Logging
 LOGGING_ENABLED=true
 LOG_FILE=detections_log.csv
 LOG_LEVEL=INFO
 
-# Configurações de Imagens
+# Imagens
 SAVE_IMAGES=true
 IMAGE_SAVE_PATH=detections_images
 IMAGE_FORMAT=jpg
 IMAGE_QUALITY=95
 
-# Configurações de Webcam
+# Webcam
 WEBCAM_INDEX=0
 WEBCAM_WIDTH=640
 WEBCAM_HEIGHT=480
 WEBCAM_FPS=30
 
-# Configurações do Gradio
+# Gradio
 GRADIO_SHARE=true
 GRADIO_PORT=7860
 GRADIO_SERVER_NAME=0.0.0.0
 ```
 
-### Filtro de Classes
+### Filtro de classes
 
-Você pode filtrar classes específicas para detecção:
+Detecte apenas classes específicas:
 
 ```python
 from src.config.config import Config
 
-config = Config(
-    allowed_classes=["person", "car", "dog"]
-)
+config = Config(allowed_classes=["person", "car", "dog"])
 ```
 
-Ou excluir classes específicas:
+Ou exclua classes específicas:
 
 ```python
-config = Config(
-    excluded_classes=["person", "cell phone"]
-)
+config = Config(excluded_classes=["person", "cell phone"])
 ```
 
 ## 📚 Exemplos
 
-### Exemplo Básico
+Consulte a pasta [`examples/`](examples/):
 
-```python
-from src.config.config import Config
-from src.detection.detector import ObjectDetector
-from src.audio.speaker import Speaker
-from src.logging.logger import DetectionLogger
-
-# Criar configuração
-config = Config()
-
-# Inicializar componentes
-detector = ObjectDetector(config)
-speaker = Speaker(config)
-logger = DetectionLogger(config)
-
-# Detectar objetos
-import cv2
-cap = cv2.VideoCapture(0)
-
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
-    
-    detections, annotated_frame = detector.detect(frame)
-    
-    for detection in detections:
-        speaker.speak_detection(detection.label, detection.confidence)
-    
-    logger.log_detections(detections, frame)
-    cv2.imshow("Detecção", annotated_frame)
-    
-    if cv2.waitKey(1) & 0xFF == ord("q"):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
-```
-
-### Exemplo Avançado
-
-Consulte os arquivos em [`examples/`](examples/) para exemplos mais detalhados:
-
-- [`basic_usage.py`](examples/basic_usage.py): Exemplo básico de uso
-- [`advanced_usage.py`](examples/advanced_usage.py): Exemplo avançado com filtros e personalização
-
-Execute os exemplos:
+- [`basic_usage.py`](examples/basic_usage.py): uso básico de ponta a ponta com a webcam.
+- [`advanced_usage.py`](examples/advanced_usage.py): filtro de classes, exportação de logs, estatísticas e configurações personalizadas.
 
 ```bash
 python examples/basic_usage.py
 python examples/advanced_usage.py
+```
+
+Exemplo mínimo de detecção em uma imagem:
+
+```python
+from src.config.config import Config
+from src.detection.detector import ObjectDetector
+
+config = Config()
+detector = ObjectDetector(config)
+
+detections, annotated_frame = detector.detect_from_image_path("minha_imagem.jpg")
+
+for d in detections:
+    print(f"{d.label}: {d.confidence:.1%} em {d.bbox}")
 ```
 
 ## 📖 API
@@ -258,24 +283,11 @@ python examples/advanced_usage.py
 ```python
 from src.config.config import Config
 
-# Criar configuração padrão
-config = Config()
-
-# Criar configuração personalizada
-config = Config(
-    model_name="yolov8n.pt",
-    confidence_threshold=0.7,
-    audio_enabled=False
-)
-
-# Carregar do ambiente
-config = Config.from_env()
-
-# Carregar de dicionário
-config = Config.from_dict({
-    "model_name": "yolov8n.pt",
-    "confidence_threshold": 0.7
-})
+config = Config()                                  # padrão
+config = Config(confidence_threshold=0.7,          # personalizado
+                audio_enabled=False)
+config = Config.from_env()                         # a partir do ambiente
+config = Config.from_dict({"confidence_threshold": 0.7})
 ```
 
 ### ObjectDetector
@@ -285,15 +297,13 @@ from src.detection.detector import ObjectDetector
 
 detector = ObjectDetector(config)
 
-# Detectar objetos
-detections, annotated_frame = detector.detect(frame)
-
-# Obter informações do modelo
+detections, annotated_frame = detector.detect(frame)          # a partir de um numpy array
+detections, annotated_frame = detector.detect_from_image_path("img.jpg")
 info = detector.get_model_info()
-
-# Obter nomes das classes
 classes = detector.get_class_names()
 ```
+
+Cada item de `detections` é um `Detection` com `label`, `confidence`, `bbox` e `to_dict()`.
 
 ### Speaker
 
@@ -301,15 +311,8 @@ classes = detector.get_class_names()
 from src.audio.speaker import Speaker
 
 speaker = Speaker(config)
-
-# Falar texto
 speaker.speak("Olá, mundo!")
-
-# Falar detecção
 speaker.speak_detection("person", 0.85)
-
-# Habilitar/desabilitar áudio
-speaker.set_enabled(True)
 speaker.set_enabled(False)
 ```
 
@@ -319,86 +322,40 @@ speaker.set_enabled(False)
 from src.logging.logger import DetectionLogger
 
 logger = DetectionLogger(config)
-
-# Logar detecções
 logger.log_detections(detections, frame)
-
-# Obter estatísticas
 stats = logger.get_statistics()
-
-# Exportar log
-logger.export_log("output.csv", format="csv")
-logger.export_log("output.json", format="json")
+logger.export_log("saida.csv", format="csv")
+logger.export_log("saida.json", format="json")
 ```
 
 ## 🧪 Desenvolvimento
 
-### Executar Testes
+### Testes
 
 ```bash
-# Executar todos os testes
-pytest
-
-# Executar com cobertura
-pytest --cov=src --cov-report=html
-
-# Executar testes específicos
-pytest tests/test_config.py
-
-# Executar apenas testes unitários
-pytest -m unit
+pytest                          # todos os testes
+pytest --cov=src                # com cobertura
+pytest tests/test_config.py     # arquivo específico
+pytest -m unit                  # apenas testes unitários
 ```
 
-### Formatação de Código
+### Qualidade de código
 
 ```bash
-# Formatar código com Black
-black src/ tests/
-
-# Verificar estilo com Flake8
-flake8 src/ tests/
-
-# Verificar tipos com MyPy
-mypy src/
+black src/ tests/               # formatação
+flake8 src/ tests/              # lint
+mypy src/                       # checagem de tipos
 ```
 
-### Estrutura do Projeto
-
-```
-DeteccaoObjetos/
-├── src/                    # Código fonte
-│   ├── config/            # Configurações
-│   ├── detection/         # Detecção de objetos
-│   ├── audio/             # Síntese de voz
-│   ├── logging/           # Logging de detecções
-│   └── interface/         # Interface Gradio
-├── tests/                 # Testes
-├── examples/              # Exemplos de uso
-├── docs/                  # Documentação
-├── data/                  # Dados
-├── logs/                  # Logs
-├── models/                # Modelos
-├── output/                # Saídas
-├── .github/               # GitHub Actions
-├── main.py               # Ponto de entrada
-├── requirements.txt      # Dependências
-├── pyproject.toml        # Configuração do projeto
-├── Dockerfile            # Docker
-├── docker-compose.yml    # Docker Compose
-└── README.md             # Este arquivo
-```
+O pipeline em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda esses mesmos passos em uma matriz de Windows, Linux e macOS por Python 3.8 a 3.11, mais o scan de segurança com bandit.
 
 ## 🐳 Docker
 
-### Construir Imagem
+### Construir e executar
 
 ```bash
 docker build -t deteccao-objetos .
-```
 
-### Executar Container
-
-```bash
 docker run -p 7860:7860 \
   -v $(pwd)/models:/app/models \
   -v $(pwd)/logs:/app/logs \
@@ -408,71 +365,97 @@ docker run -p 7860:7860 \
 ### Docker Compose
 
 ```bash
-# Iniciar todos os serviços
-docker-compose up -d
-
-# Parar todos os serviços
-docker-compose down
-
-# Visualizar logs
-docker-compose logs -f
+docker-compose up -d       # sobe o serviço de detecção
+docker-compose logs -f     # acompanha os logs
+docker-compose down        # encerra
 ```
+
+O `docker-compose.yml` traz um perfil opcional `monitoring` com Prometheus e Grafana. O Grafana lê a senha de administrador da variável `GF_SECURITY_ADMIN_PASSWORD` definida no `.env`, e o Prometheus espera um `prometheus.yml` na raiz do projeto.
+
+## 📁 Estrutura do Projeto
+
+```
+DeteccaoObjetos/
+├── src/                      # Código-fonte modular
+│   ├── config/               # Config (dataclass, .env, filtros de classe)
+│   ├── detection/            # ObjectDetector + dataclass Detection (YOLOv5)
+│   ├── audio/                # Speaker (gTTS, playback multiplataforma)
+│   ├── logging/              # DetectionLogger (CSV, imagens, estatísticas)
+│   └── interface/            # GradioInterface (4 abas)
+├── tests/                    # Testes pytest (conftest, test_config, test_detector)
+├── examples/                 # basic_usage.py e advanced_usage.py
+├── docs/                     # Documentação
+├── data/                     # Dados
+├── models/                   # Pesos YOLO (baixados em tempo de execução)
+├── .github/workflows/ci.yml  # Pipeline de CI/CD
+├── main.py                   # Ponto de entrada modular (app completo)
+├── detecao_objetos.py        # Script original enxuto (entrada alternativa)
+├── requirements.txt          # Dependências
+├── pyproject.toml            # Build, lint, testes e cobertura
+├── Dockerfile                # Imagem Docker
+├── docker-compose.yml        # Orquestração (+ perfil monitoring opcional)
+├── .env.example              # Modelo de variáveis de ambiente
+├── CONTRIBUTING.md           # Guia de contribuição
+├── CHANGELOG.md              # Histórico de versões
+├── LICENSE                   # Licença MIT
+└── README.md                 # Este arquivo
+```
+
+Ao rodar, o sistema cria `detections_log.csv`, a pasta `detections_images/` e o arquivo `app.log`.
 
 ## 📊 Precisão do Modelo
 
-O YOLOv5s tem alta precisão para objetos comuns. Durante os testes, foram obtidos os seguintes valores médios de confiança:
+O YOLOv5s tem boa precisão para objetos comuns. Durante os testes, foram observados os seguintes valores médios de confiança:
 
 | Objeto | Precisão Média |
-|---------|----------------|
-| 🧑‍🤝‍🧑 Pessoa | 85-90% |
-| 📱 Celular | 70-80% |
-| 📺 TV | 65-80% |
-| 💻 Laptop | 50-80% |
-| 🌱 Planta | 30-40% |
+|--------|----------------|
+| 🧑‍🤝‍🧑 Pessoa | 85 a 90% |
+| 📱 Celular | 70 a 80% |
+| 📺 TV | 65 a 80% |
+| 💻 Laptop | 50 a 80% |
+| 🌱 Planta | 30 a 40% |
 
-A precisão varia dependendo da iluminação, distância e qualidade da câmera.
+A precisão varia conforme a iluminação, a distância e a qualidade da câmera.
 
 ## 🤝 Contribuindo
 
-Contribuições são bem-vindas! Por favor, leia o [`CONTRIBUTING.md`](CONTRIBUTING.md) para detalhes sobre como contribuir.
+Contribuições são bem-vindas. Leia o [`CONTRIBUTING.md`](CONTRIBUTING.md) para os detalhes.
 
-### Como Contribuir
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
-3. Commit suas mudanças (`git commit -m 'Add: Minha Feature'`)
-4. Push para a branch (`git push origin feature/MinhaFeature`)
-5. Abra um Pull Request
+1. Faça um fork do repositório.
+2. Crie uma branch para sua feature: `git checkout -b feature/MinhaFeature`.
+3. Commite suas mudanças: `git commit -m "Add: minha feature"`.
+4. Faça push para a branch: `git push origin feature/MinhaFeature`.
+5. Abra um Pull Request.
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [`LICENSE`](LICENSE) para detalhes.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [`LICENSE`](LICENSE) para detalhes.
 
 ## 👤 Autor
 
 **Rone Bragaglia**
 
 - GitHub: [@Ronbragaglia](https://github.com/Ronbragaglia)
-- Email: ronbragaglia@gmail.com
 
 ## 🙏 Agradecimentos
 
 - [Ultralytics](https://github.com/ultralytics/ultralytics) pelo YOLOv5
-- [Gradio](https://gradio.app/) pela interface de usuário
+- [Gradio](https://www.gradio.app/) pela interface
 - [OpenCV](https://opencv.org/) pelo processamento de imagens
-- [Google](https://cloud.google.com/text-to-speech) pelo gTTS
+- [gTTS](https://pypi.org/project/gTTS/) pela síntese de voz
 
 ## 📞 Suporte
 
-Se você tiver alguma dúvida ou problema:
-
-- Abra uma [issue](https://github.com/Ronbragaglia/DeteccaoObjetos/issues)
-- Envie um email para ronbragaglia@gmail.com
+Encontrou um problema ou tem uma ideia? Abra uma [issue](https://github.com/Ronbragaglia/DeteccaoObjetos/issues).
 
 ## 📝 Changelog
 
-Veja o [`CHANGELOG.md`](CHANGELOG.md) para informações sobre mudanças recentes.
+Veja o [`CHANGELOG.md`](CHANGELOG.md) para o histórico de mudanças.
 
 ---
 
-**⭐ Se este projeto foi útil para você, considere dar uma estrela! ⭐**
+<div align="center">
+
+**⭐ Se este projeto foi útil para você, deixe uma estrela! ⭐**
+
+</div>
